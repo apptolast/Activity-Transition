@@ -1,0 +1,53 @@
+# ===================================
+# Gradle / Build System
+# ===================================
+.gradle/
+build/
+local.properties
+
+# ===================================
+# IDE files (Android Studio, IntelliJ)
+# ===================================
+.idea/
+*.iml
+*.ipr
+*.iws
+shelf/
+.DS_Store
+
+# ===================================
+# KMP / Xcode specific
+# ===================================
+**/build/ # Catch-all for any build directory, including composeApp/build
+.cxx/
+*.klib
+
+# Xcode files
+DerivedData/
+*.hmap
+*.ipa
+xcuserdata/
+*.xcworkspace/
+
+# ===================================
+# Secrets & Sensitive Info
+# ===================================
+*.jks
+*.keystore
+
+# IMPORTANT: This file contains your Firebase project's API keys.
+# It should NEVER be committed to public version control.
+google-services.json
+
+# ===================================
+# Misc & Output
+# ===================================
+# Log files
+*.log
+
+# Android artifacts
+*.apk
+*.aab
+output-metadata.json
+captures/
+*.hprof
