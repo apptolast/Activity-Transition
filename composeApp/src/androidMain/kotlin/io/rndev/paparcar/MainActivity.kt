@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Create the notification channel on app startup
-        NotificationHelper(this).createNotificationChannel()
+        NotificationHelper(this).createNotificationChannels()
         requestPermissions()
 
         setContent {
@@ -53,6 +53,10 @@ class MainActivity : ComponentActivity() {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACTIVITY_RECOGNITION
         )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissionsToRequest.add(Manifest.permission.BLUETOOTH_CONNECT)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
