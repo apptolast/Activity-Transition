@@ -5,58 +5,58 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.google.android.gms.location.ActivityTransition
-import com.google.android.gms.location.ActivityTransitionEvent
 import com.google.android.gms.location.ActivityTransitionResult
 import com.google.android.gms.location.DetectedActivity
-import io.rndev.paparcar.presentation.NotificationHelper
-import kotlinx.coroutines.flow.MutableSharedFlow
+import io.rndev.paparcar.domain.service.AppNotificationManager
+import org.koin.java.KoinJavaComponent.getKoin
 
+// DO NOT implement KoinComponent or inject properties here.
 class ActivityTransitionReceiver : BroadcastReceiver() {
 
+    init {
+        // This log should now appear in Logcat as the crash during instantiation is fixed.
+        Log.d("ActivityTransitionReceiver", "Receiver instance created successfully.")
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d("PaparcarApp", "[BroadcastReceiver] onReceive triggered.")
+        Log.d("ActivityTransitionReceiver", "onReceive called")
+
+        // Safely get dependencies inside onReceive, not as a class property.
+        // At this point, Koin is guaranteed to be initialized.
+        val notificationManager: AppNotificationManager = getKoin().get()
+
         if (ActivityTransitionResult.hasResult(intent)) {
+            Log.d("ActivityTransitionReceiver", "onReceive: ActivityTransitionResult.hasResult(intent)")
+
             val result = ActivityTransitionResult.extractResult(intent)
-            result?.let {
-                val notificationHelper = NotificationHelper(context)
+            result?.transitionEvents?.forEach { event ->
+                Log.d("ActivityTransitionReceiver", "onReceive: event.activityType = ${event.activityType}, event.transitionType = ${event.transitionType}")
+                ActivityTransitionEventSource.postEvent(event)
 
-                it.transitionEvents.forEach { event ->
-                    val activityName = mapActivity(event.activityType)
-                    val transitionName = mapTransition(event.transitionType)
-                    
-                    val logMessage = "[BroadcastReceiver] Activity Event: Type=$activityName, Transition=$transitionName"
-                    Log.d("PaparcarApp", logMessage)
-                    _events.tryEmit(event)
-                    
-                    notificationHelper.showTransitionNotification(activityName, transitionName)
-                }
+                val activityName = activityTypeToString(event.activityType)
+                val transitionName = transitionTypeToString(event.transitionType)
+                notificationManager.showActivityTransitionNotification(activityName, transitionName)
             }
-        } else {
-            Log.w("PaparcarApp", "[BroadcastReceiver] Intent received with no ActivityTransitionResult.")
         }
     }
 
-    private fun mapActivity(type: Int): String {
-        return when (type) {
-            DetectedActivity.IN_VEHICLE -> "IN_VEHICLE"
-            DetectedActivity.STILL -> "STILL"
-            DetectedActivity.ON_FOOT -> "ON_FOOT"
-            DetectedActivity.WALKING -> "WALKING"
-            DetectedActivity.RUNNING -> "RUNNING"
-            else -> "UNKNOWN ($type)"
+    private fun activityTypeToString(activityType: Int): String {
+        return when (activityType) {
+            DetectedActivity.IN_VEHICLE -> "In Vehicle"
+            DetectedActivity.ON_BICYCLE -> "On Bicycle"
+            DetectedActivity.ON_FOOT -> "On Foot"
+            DetectedActivity.STILL -> "Still"
+            DetectedActivity.WALKING -> "Walking"
+            DetectedActivity.RUNNING -> "Running"
+            else -> "Unknown"
         }
     }
 
-    private fun mapTransition(type: Int): String {
-        return when (type) {
-            ActivityTransition.ACTIVITY_TRANSITION_ENTER -> "ENTER"
-            ActivityTransition.ACTIVITY_TRANSITION_EXIT -> "EXIT"
-            else -> "UNKNOWN ($type)"
+    private fun transitionTypeToString(transitionType: Int): String {
+        return when (transitionType) {
+            ActivityTransition.ACTIVITY_TRANSITION_ENTER -> "Enter"
+            ActivityTransition.ACTIVITY_TRANSITION_EXIT -> "Exit"
+            else -> "Unknown"
         }
-    }
-
-    companion object {
-        private val _events = MutableSharedFlow<ActivityTransitionEvent>()
-        val events = _events
     }
 }

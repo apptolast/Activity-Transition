@@ -31,20 +31,20 @@
         </activity>
         <receiver
             android:name=".data.receiver.ActivityTransitionReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="io.rndev.paparcar.TRANSITION_RECEIVER_ACTION" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".platform.service.LocationForegroundService"
+            android:name=".data.service.LocationForegroundService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
 
         <receiver
-            android:name=".platform.broadcast.BluetoothConnectionReceiver"
+            android:name=".data.receiver.BluetoothConnectionReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

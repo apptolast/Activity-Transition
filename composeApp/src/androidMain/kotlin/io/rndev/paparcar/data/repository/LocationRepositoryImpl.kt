@@ -1,15 +1,15 @@
 package io.rndev.paparcar.data.repository
 
-import android.location.Location
-import io.rndev.paparcar.data.source.LocationDataSource
+import io.rndev.paparcar.domain.model.Location
 import io.rndev.paparcar.domain.repository.LocationRepository
+import io.rndev.paparcar.domain.service.LocationService
 import kotlinx.coroutines.flow.Flow
 
 class LocationRepositoryImpl(
-    private val locationDataSource: LocationDataSource
+    private val locationService: LocationService
 ) : LocationRepository {
 
     override fun getLocationUpdates(): Flow<Location> {
-        return locationDataSource.getLocationUpdates()
+        return locationService.getLocationUpdates()
     }
 }
